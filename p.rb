@@ -15,7 +15,7 @@ class Apolo
 		@initial_status = lives
 		@board = Array.new(@length_y){Array.new(@length_x,false)}
 		lives.each do |l|
-			@board[l[0]][l[1]] = true
+			@board[l[1]][l[0]] = true
 		end
 	end
 
@@ -24,8 +24,8 @@ class Apolo
 			newBoard = Array.new(@length_y){Array.new(@length_x,false)}
 			(0...@length_y).each do |l|
 				(0...@length_x).each do |p|
-					alive = switch(@board,surround_with(@length_x,@length_y,p,l),@board[p][l])
-					newBoard[p][l] = alive
+					alive = switch(@board,surround_with(@length_x,@length_y,p,l),@board[l][p])
+					newBoard[l][p] = alive
 				#	p "(#{p},#{l}) is alive!" if alive
 				end	
 			end
@@ -38,16 +38,23 @@ class Apolo
 	def reset
 		@board = Array.new(@length_y){Array.new(@length_x,false)}
 		@initial_status.each do |l|
-			@board[l[0]][l[1]] = true
+			@board[l[1]][l[0]] = true
 		end
 	end
 
 	def draw(order='-')
-		print "---------------\n"
+		point = "-----"
+		ten	= "-----"
+		(0..@length_x/10).each do |t|
+			point << '0123456789'
+			ten << "%-10s" % t
+		end
+		print ten << "\n"
+		print point << "\n"
 		(0...@length_y).each do |line|
-			single = "|"
+			single = "%04d|"%line
 			(0...@length_x).each do |x|
-				if @board[x][line]
+				if @board[line][x]
 					single << "H"
 				else
 					single << " "
@@ -55,8 +62,10 @@ class Apolo
 			end
 			print "#{single}|\n"
 		end
-		print "------------#{order}-\n"
+		print "#{point}#{ten}#{order}\n"
 	end
+
+	alias to_s draw
 
 :private
 	def surround_with(length_x,length_y,x=0,y=0)
@@ -75,7 +84,7 @@ class Apolo
 	def switch(board,surrounds,alive)
 		count = 0
 		surrounds.each do |p|
-			count += 1 if board[p[0]][p[1]]
+			count += 1 if board[p[1]][p[0]]
 		end
 	#	p "#{alive},#{count}"
 		alive && (count == 2 || count ==3) ||
@@ -84,4 +93,5 @@ class Apolo
 
 end
 
-a=Apolo.new(158,58,[[73,23],[73,24],[73,25],[74,24],[75,23]])
+a=Apolo.new(158,58,[[73,23],[73,24],[73,25],[72,24],[74,23]])
+b=Apolo.new(100,50,[[48,25],[49,25],[48,26],[49,26],[50,27],[50,28],[51,27],[51,28]])
